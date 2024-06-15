@@ -13,9 +13,9 @@
 
         .navbar {
             background-color: #1a1a1a;
-            padding: 35px 0;
+            padding: 20px 50px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             position: relative;
         }
@@ -29,13 +29,6 @@
             margin: 0;
             padding: 0;
             line-height: 1;
-        }
-
-        .signin {
-            position: absolute;
-            right: 50px;
-            color: #aaa;
-            font-size: 14px;
         }
 
         .navbar-links {
@@ -56,31 +49,43 @@
             font-size: 14px;
             text-transform: uppercase;
         }
-        
+
         .navbar a {
             color: #aaa;
             text-decoration: none;
+            margin: 0 10px;
         }
 
-        .navbar-links a:hover {
+        .navbar-links a:hover, .signin:hover {
             color: #fff;
         }
+        
+        .signin-container {
+            display: flex;
+            align-items: center;
+        }
 
-        .signin:hover {
-            color: #fff;
+        .signin {
+            color: #aaa;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="navbar">
         <div class="navbar-logo">CBNU Records</div>
-        <a href="login.html" >
-        <div class="signin">Sign In</div></a>
+        <div class="signin-container">
+            <a href="login.html" class="signin" id="login-link">Login</a>
+            <a href="join.html" class="signin" id="join-link">Sign In</a>
+            <a href="#" class="signin" id="logout-link" style="display: none;">Logout</a>
+        </div>
     </div>
     <div class="navbar-links">
-        <a href="#" >Home</a>
-        <a href="#">About Us</a>
-        <a href="#">Store</a>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Store</a></li>
     </div>
+
+    <script type="module" src="script/navbar.js"></script>
 </body>
 </html>
