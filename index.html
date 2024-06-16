@@ -72,6 +72,71 @@
             color: #aaa;
             font-size: 14px;
         }
+
+        .content {
+            display: flex;
+            padding: 20px;
+            height: 720px;
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .left-column div {
+            flex: 1;
+            border: 0px;
+            margin-bottom: 10px;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            border: 0px;
+        }
+
+        .top-left, .bottom-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .top-left img, .bottom-left img {
+            width: 300px;
+            height: auto;
+            padding: 30px;
+        }
+
+        .top-left .text, .bottom-left .text {
+            padding: 30px;
+            font-size: 18px;
+            color: #333;
+            font-style: italic;
+            border: none; 
+        }
+
+        .right-content {
+            display: flex;
+            align-items: center;
+            
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .right-content p {
+            font-style: italic;
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .right-content img {
+            width: 150px;
+            height: auto;
+        }
+
     </style>
 </head>
 <body>
@@ -88,7 +153,47 @@
         <a href="about.html">About Us</a>
         <a href="store.html">Store</a>
     </div>
-
+    <div class="content">
+        <div class="left-column">
+            <div class="top-left">
+                <img src="img/Hovvdy.png" alt="Top Left Image">
+                <div class="text">
+                    <h2>Hovvdy's new album</h2>
+                    <p>"Hovvdy," a new album by indie pop duo Hobvdy, has been released on CBNU Records.</p>
+                    <p>인디 팝 듀오인 Hovvdy의 새로운 앨범인 "Hovvdy"이 CBNU Records에 입고되었습니다.</p>
+                </div>
+            </div>
+            <div class="bottom-left">
+                <img src="img/albums.PNG" alt="Bottom Left Image">
+                <div class="text">
+                    <h2>The Best Music of 2024 So Far</h2>
+                    <p>A rolling list of our favorite albums of the year, updated somewhat frequently.</p>
+                    <p>올해의 가장 좋은 음악들을 소개합니다. 자주 업데이트됩니다.</p>
+                </div>
+            </div>
+        </div>
+        <div class="right-column">
+            <div class="right-content">
+                <p><strong>One Hand Clapping</strong><br><br><strong>Paul McCartney / Wings</strong><br><br>Shelved for decades and now finally released in full, Wings’ 1974 Abbey Road sessions 
+                    are intimate and exploratory, showcasing a seldom heard, anything-goes side of the former Beatle. </p> 
+                <img src="img/Onehandclapping.png" alt="1 Right Image">
+            </div>
+            <div class="right-content">
+                <p><strong>Why Lawd?</strong><br><br><strong>NxWorries</strong><br><br>Anderson .Paak and Knxwledge’s sly, smooth-talking rap&B sounds older and wiser these days. The duo’s 
+                    stellar second album layers doubt and insecurity into jet-setting antics and featherbed-plush beats. </p> 
+                <img src="img/whylawd.png" alt="2 Right Image">
+            </div>
+            <div class="right-content">
+                <p><strong>boy</strong><br><br><strong>2hollis</strong><br><br>At a time when dance music is pop and pop is rap and rap is emo and everything is electronic, 
+                    the Los Angeles-based artist synthesizes it all into a gaudy yet distinctive sound. </p> 
+                <img src="img/2hollis.png" alt="2 Right Image">
+            </div>
+            <div class="right-content">
+                <p><strong>Box for Buddy, Box for Star</strong><br><br><strong>This Is Lorelei</strong><br><br>On the first proper album under his solo alias, Water From Your Eyes’ Nate Amos balances self-reflection with a sly, idiosyncratic approach to DIY pop songcraft.</p> 
+                <img src="img/This-Is-Lorelei.png" alt="2 Right Image">
+            </div>
+        </div>
+    </div>
     <script type="module" src="script/navbar.js"></script>
 </body>
 </html>
