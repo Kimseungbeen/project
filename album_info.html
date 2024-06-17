@@ -26,6 +26,20 @@
         .footer {
             position: relative!important;
         }
+        .add-to-cart-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #1a1a1a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #333;
+        }
     </style>
 </head>
 <body>
@@ -127,11 +141,17 @@
                     const albumDescription = document.createElement('p');
                     albumDescription.textContent = album.description || '설명이 없습니다.';
                     
+                    const addToCartButton = document.createElement('button');
+                    addToCartButton.textContent = 'Add to Cart';
+                    addToCartButton.classList.add('add-to-cart-btn');
+                    addToCartButton.onclick = () => addToCart(doc.id, album);
+
                     albumInfoDiv.appendChild(albumImg);
                     albumInfoDiv.appendChild(albumNameElem);
                     albumInfoDiv.appendChild(albumArtist);
                     albumInfoDiv.appendChild(albumPrice);
                     albumInfoDiv.appendChild(albumDescription);
+                    albumInfoDiv.appendChild(addToCartButton);
 
                     albumDescription.classList.add('description');
                     // Replace line breaks with <br> tags
@@ -140,6 +160,23 @@
                 });
             }).catch(error => {
                 console.error('Error getting documents: ', error);
+            });
+        }
+
+        // 장바구니에 항목 추가
+        function addToCart(id, album) {
+            const cartItem = {
+                album_id: id,
+                name: album.album_name,
+                price: album.price,
+                image_url: album.cover_image_url,
+                quantity: 1
+            };
+
+            db.collection('cart').add(cartItem).then(() => {
+                alert('장바구니에 추가되었습니다.');
+            }).catch(error => {
+                console.error('Error adding document: ', error);
             });
         }
     </script>
