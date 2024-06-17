@@ -13,19 +13,24 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding-bottom: 60px; /* Ensure content above footer */
+            background-color: #1a1a1a; /* Matching header and footer background color */
+            color: #aaa; /* Text color */
         }
         .container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            padding: 20px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 30px;
+            padding: 50px;
+            background-color: darkslategrey; /* Matching header and footer background color */
+            color: #aaa; /* Text color */
         }
         .album {
             text-align: center;
             border: 1px solid #ccc;
             border-radius: 10px;
             overflow: hidden;
-            background-color: #f9f9f9;
+            background-color: #333; /* Darker background for album items */
+            color: #fff; /* White text for better contrast */
         }
         .album img {
             width: 100%;
@@ -59,7 +64,7 @@
 <body>
     <div id="header"></div>
 
-    <h1>앨범 목록</h1>
+    <h1 style="text-align:center; color: #fff;">앨범 목록</h1>
     <div class="container" id="albumList">
         <!-- 앨범 항목들이 여기에 동적으로 추가될 것입니다. -->
     </div>
