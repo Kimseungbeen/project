@@ -35,25 +35,38 @@
         }
 
         .album {
-            margin: 5% 0 0 0;
-            width: 30%;
-            text-align: center;
+            border-bottom: 1px solid #ccc;
+            margin: 2.5% 1.5% 2.5% 1.5%;
+            width: 28%;
+            text-align: left;
             overflow: hidden;
             cursor: pointer; /* Add cursor to indicate clickable */
         }
 
+        .top {
+            text-align: center;
+            margin: 2.5% 0 2.5% 0;
+        }
+
         .album img {
-            width: 60%;
-            height: auto;
+            width: 100%;
+            height: 80%;
         }
         .album p {
-            margin: 10px 0;
+            margin: 10px 0; 
+        }
+        .album p1 {
+            color: gray;
         }
     </style>
 </head>
 <body>
     <div id="header"></div>
     <div class="content">
+    <div class="top">
+        <h1>STORE</h1>
+        <p>오픈소스 웹소프트웨어 CBNU RECORDS팀 홈페이지-STORE</p>
+    </div>
     <div class="container" id="albumList">
         <!-- 앨범 항목들이 여기에 동적으로 추가될 것입니다. -->
     </div>
@@ -128,10 +141,15 @@
                 const albumPrice = document.createElement('p');
                 albumPrice.textContent = `Price: ${album.price}`;
 
+                const albumDate = document.createElement('p1');
+                albumDate.textContent = album.release_date.toDate ? album.release_date.toDate().toLocaleDateString() : new Date(album.release_date.seconds * 1000).toLocaleDateString();
+
                 albumDiv.appendChild(albumImg);
                 albumDiv.appendChild(albumName);
                 albumDiv.appendChild(albumPrice)
+                albumDiv.appendChild(albumDate);
                 albumList.appendChild(albumDiv);
+                
             });
         }).catch(error => {
             console.error('Error getting documents: ', error);
