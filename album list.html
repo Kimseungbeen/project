@@ -13,24 +13,20 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding-bottom: 60px; /* Ensure content above footer */
-            background-color: #1a1a1a; /* Matching header and footer background color */
-            color: #aaa; /* Text color */
         }
         .container {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 30px;
-            padding: 50px;
-            background-color: #fff; /* Matching header and footer background color */
-            color: #aaa; /* Text color */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 20px;
         }
         .album {
             text-align: center;
             border: 1px solid #ccc;
             border-radius: 10px;
             overflow: hidden;
-            background-color: #333; /* Darker background for album items */
-            color: #fff; /* White text for better contrast */
+            background-color: #f9f9f9;
+            cursor: pointer; /* Add cursor to indicate clickable */
         }
         .album img {
             width: 100%;
@@ -64,7 +60,7 @@
 <body>
     <div id="header"></div>
 
-    <h1 style="text-align:center; color: #fff;">앨범 목록</h1>
+    <h1>앨범 목록</h1>
     <div class="container" id="albumList">
         <!-- 앨범 항목들이 여기에 동적으로 추가될 것입니다. -->
     </div>
@@ -96,7 +92,7 @@
                 });
         }
 
-        // 페이지 로드 시 헤더와 푸터를 로드
+        // 페이지 로드 시 헤더와 푸터를 로드합니다.
         window.onload = function() {
             loadHeader();
             loadFooter();
@@ -124,6 +120,11 @@
                 const album = doc.data();
                 const albumDiv = document.createElement('div');
                 albumDiv.classList.add('album');
+
+                // 앨범 이미지를 클릭할 때 호출되는 함수
+                albumDiv.onclick = function() {
+                    window.location.href = `album_info.html?albumName=${encodeURIComponent(album.album_name)}`;
+                };
 
                 const albumImg = document.createElement('img');
                 albumImg.src = album.cover_image_url;
