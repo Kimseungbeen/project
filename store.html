@@ -3,112 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBNU Records</title>
+    <title>앨범 목록</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
     <style>
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #FFFFFF;
-        }
-
-        .navbar {
-            background-color: #1a1a1a;
-            padding: 35px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .navbar-logo {
-            font-size: 36px;
-            color: #fff;
-            font-family: 'Georgia', serif;
-            font-weight: bold;
-            text-transform: uppercase;
             margin: 0;
-            padding: 15px;
-            line-height: 1;
         }
 
-        .navbar-links {
+
+        .content {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            padding: 18px 0;
-            background-color: #1a1a1a;
-            border-top: 1px solid #FFFFFF;
             width: 100%;
+            flex-direction: column;
+            overflow-y: auto;
         }
 
-        .navbar-links a {
-            color: #aaa;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 14px;
-            text-transform: uppercase;
+        .footer {
+            position: relative!important;
         }
 
-        .navbar a {
-            color: #aaa;
-            text-decoration: none;
-            margin: 0 10px;
-        }
 
-        .navbar-links a:hover, .signin:hover {
-            color: #fff;
-        }
-        
-        .signin-container {
+        .container{
             display: flex;
-            position: absolute;
-            right: 50px;
-            color: #aaa;
-            font-size: 14px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .signin {
-            color: #aaa;
-            font-size: 14px;
+        .album {
+            margin: 5% 0 0 0;
+            width: 30%;
+            text-align: center;
+            overflow: hidden;
+            cursor: pointer; /* Add cursor to indicate clickable */
+        }
+
+        .album img {
+            width: 60%;
+            height: auto;
+        }
+        .album p {
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="navbar-logo">CBNU Records</div>
-        <div class="signin-container">
-            <a href="login.html" class="signin" id="login-link">Login</a>
-            <a href="join.html" class="signin" id="join-link">Sign In</a>
-            <a href="#" class="signin" id="logout-link" style="display: none;">Logout</a>
-        </div>
+    <div id="header"></div>
+    <div class="content">
+    <div class="container" id="albumList">
+        <!-- 앨범 항목들이 여기에 동적으로 추가될 것입니다. -->
     </div>
-    <div class="navbar-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About Us</a>
-        <a href="store.html">Store</a>
+    <div id="footer"></div>
     </div>
 
-    <script type="module" src="script/navbar.js"></script>
-    <div id="footer"></div>
-    <script type="text/javascript">
+    <script>
+        // 헤더를 동적으로 로드하는 함수
+        function loadHeader() {
+            fetch('header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading header:', error);
+                });
+        }
 
         // 푸터를 동적으로 로드하는 함수
         function loadFooter() {
             fetch('footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer').innerHTML = data;
-            })
-            .catch(error => {
-                console.error('Error loading footer:', error);
-            });
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading footer:', error);
+                });
         }
 
-        // 페이지 로드 시 헤더와 푸터를 로드
+        // 페이지 로드 시 헤더와 푸터를 로드합니다.
         window.onload = function() {
+            loadHeader();
             loadFooter();
         };
+
+        // Firebase 구성
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0tTW3h8TC2LNjVnPHsgAwAaAJ9hQ-GGU",
+            authDomain: "musicweb-67e10.firebaseapp.com",
+            projectId: "musicweb-67e10",
+            storageBucket: "musicweb-67e10.appspot.com",
+            messagingSenderId: "411216875147",
+            appId: "1:411216875147:web:6bd13f389eed0a42580e8e"
+        };
+
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Firestore에서 앨범 데이터 가져오기
+        db.collection('albums').get().then(snapshot => {
+            const albumList = document.getElementById('albumList');
+            snapshot.forEach(doc => {
+                const album = doc.data();
+                const albumDiv = document.createElement('div');
+                albumDiv.classList.add('album');
+
+                // 앨범 이미지를 클릭할 때 호출되는 함수
+                albumDiv.onclick = function() {
+                    window.location.href = `album_info.html?albumName=${encodeURIComponent(album.album_name)}`;
+                };
+
+                const albumImg = document.createElement('img');
+                albumImg.src = album.cover_image_url;
+
+                const albumName = document.createElement('h2');
+                albumName.textContent = album.album_name;
+
+                const albumPrice = document.createElement('p');
+                albumPrice.textContent = `Price: ${album.price}`;
+
+                albumDiv.appendChild(albumImg);
+                albumDiv.appendChild(albumName);
+                albumDiv.appendChild(albumPrice)
+                albumList.appendChild(albumDiv);
+            });
+        }).catch(error => {
+            console.error('Error getting documents: ', error);
+        });
     </script>
 </body>
 </html>

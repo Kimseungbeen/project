@@ -12,35 +12,19 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding-bottom: 60px; /* Ensure content above footer */
         }
         .album-info {
             text-align: center;
+            font-style: italic;
             padding: 20px;
+            justify-content: center;
         }
         .album-info img {
-            width: 300px;
+            width: 200px;
             height: auto;
         }
         .footer {
-            background-color: #1a1a1a;
-            color: #aaa;
-            text-align: center;
-            padding: 20px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .footer a {
-            color: #aaa;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 14px;
-        }
-
-        .footer a:hover {
-            color: #fff;
+            position: relative!important;
         }
     </style>
 </head>
@@ -121,22 +105,38 @@
                 }
 
                 snapshot.forEach(doc => {
+                    // 앨범 정보를 가져와서 HTML에 추가
                     const album = doc.data();
                     const albumInfoDiv = document.getElementById('albumInfo');
-
+                    
+                    // element 생성
                     const albumImg = document.createElement('img');
+                    // element에 속성 추가
                     albumImg.src = album.cover_image_url;
                     albumImg.alt = album.album_name;
 
                     const albumNameElem = document.createElement('h2');
-                    albumNameElem.textContent = album.album_name;
+                    albumNameElem.textContent = `Album: ${album.album_name}`;
+
+                    const albumPrice = document.createElement('h2');
+                    albumPrice.textContent = `Price: ${album.price}`;
+
+                    const albumArtist = document.createElement('h2');
+                    albumArtist.textContent = `Artist: ${album.artist_name}`;
 
                     const albumDescription = document.createElement('p');
                     albumDescription.textContent = album.description || '설명이 없습니다.';
-
+                    
                     albumInfoDiv.appendChild(albumImg);
                     albumInfoDiv.appendChild(albumNameElem);
+                    albumInfoDiv.appendChild(albumArtist);
+                    albumInfoDiv.appendChild(albumPrice);
                     albumInfoDiv.appendChild(albumDescription);
+
+                    albumDescription.classList.add('description');
+                    // Replace line breaks with <br> tags
+                    albumDescription.innerHTML = (album.description || '설명이 없습니다.').replace(/\n/g, '<br>');
+                    
                 });
             }).catch(error => {
                 console.error('Error getting documents: ', error);
