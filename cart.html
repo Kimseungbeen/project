@@ -69,16 +69,30 @@
             padding: 20px 0;
             width: 100%;
         }
-
         .footer a {
             color: #aaa;
             text-decoration: none;
             margin: 0 15px;
             font-size: 14px;
         }
-
         .footer a:hover {
             color: #fff;
+        }
+        .buy-button-container {
+            text-align: right;
+            padding: 20px;
+        }
+        .buy-button {
+            background-color: #1a1a1a;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buy-button:hover {
+            background-color: #333;
         }
     </style>
 </head>
@@ -94,7 +108,6 @@
                         <th>상품 이미지</th>
                         <th>상품명</th>
                         <th>가격</th>
-                        <th>수량</th>
                         <th>합계</th>
                         <th>삭제</th>
                     </tr>
@@ -105,6 +118,9 @@
             </table>
             <div class="total-container">
                 총 합계: <span id="totalPrice">₩0</span>
+            </div>
+            <div class="buy-button-container">
+                <button class="buy-button" onclick="purchaseItems()">구매하기</button>
             </div>
         </div>
     </div>
@@ -180,11 +196,8 @@
                     const priceCell = document.createElement('td');
                     priceCell.textContent = `₩${cartItem.price.toLocaleString()}`;
 
-                    const qtyCell = document.createElement('td');
-                    qtyCell.textContent = cartItem.quantity;
-
                     const totalCell = document.createElement('td');
-                    const itemTotal = cartItem.price * cartItem.quantity;
+                    const itemTotal = cartItem.price; // Since quantity is removed, total is same as price
                     totalCell.textContent = `₩${itemTotal.toLocaleString()}`;
 
                     const deleteCell = document.createElement('td');
@@ -196,7 +209,6 @@
                     cartRow.appendChild(imgCell);
                     cartRow.appendChild(nameCell);
                     cartRow.appendChild(priceCell);
-                    cartRow.appendChild(qtyCell);
                     cartRow.appendChild(totalCell);
                     cartRow.appendChild(deleteCell);
 
@@ -218,6 +230,24 @@
                 loadCart();
             }).catch(error => {
                 console.error('Error removing document: ', error);
+            });
+        }
+
+        // 구매하기 버튼 클릭 시 장바구니 초기화
+        function purchaseItems() {
+            db.collection('cart').get().then(snapshot => {
+                const batch = db.batch();
+
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                return batch.commit();
+            }).then(() => {
+                alert('구매했습니다.');
+                loadCart();
+            }).catch(error => {
+                console.error('Error purchasing items: ', error);
             });
         }
     </script>
