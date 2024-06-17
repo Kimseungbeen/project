@@ -74,7 +74,7 @@
         }
 
         .content {
-            padding: 20px;
+            padding: 11px;
             text-align: center;
         }
 
@@ -155,5 +155,26 @@
     </div>
 
     <script type="module" src="script/navbar.js"></script>
+    <div id="footer"></div>
+    <script type="text/javascript">
+
+        // 푸터를 동적으로 로드하는 함수
+        function loadFooter() {
+            fetch('footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error loading footer:', error);
+            });
+        }
+
+        // 페이지 로드 시 헤더와 푸터를 로드
+        window.onload = function() {
+            loadFooter();
+        };
+    </script>
 </body>
+
 </html>
