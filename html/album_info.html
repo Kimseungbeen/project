@@ -8,25 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-        }
-        .album-info {
-            text-align: center;
-            font-style: italic;
-            padding: 20px;
-            justify-content: center;
-        }
-        .album-info img {
-            width: 200px;
-            height: auto;
-        }
-        .footer {
-            position: relative!important;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div id="header"></div>
@@ -127,11 +109,17 @@
                     const albumDescription = document.createElement('p');
                     albumDescription.textContent = album.description || '설명이 없습니다.';
                     
+                    const addToCartButton = document.createElement('button');
+                    addToCartButton.textContent = 'Add to Cart';
+                    addToCartButton.classList.add('add-to-cart-btn');
+                    addToCartButton.onclick = () => addToCart(doc.id, album);
+
                     albumInfoDiv.appendChild(albumImg);
                     albumInfoDiv.appendChild(albumNameElem);
                     albumInfoDiv.appendChild(albumArtist);
                     albumInfoDiv.appendChild(albumPrice);
                     albumInfoDiv.appendChild(albumDescription);
+                    albumInfoDiv.appendChild(addToCartButton);
 
                     albumDescription.classList.add('description');
                     // Replace line breaks with <br> tags
@@ -140,6 +128,23 @@
                 });
             }).catch(error => {
                 console.error('Error getting documents: ', error);
+            });
+        }
+
+        // 장바구니에 항목 추가
+        function addToCart(id, album) {
+            const cartItem = {
+                album_id: id,
+                name: album.album_name,
+                price: album.price,
+                image_url: album.cover_image_url,
+                quantity: 1
+            };
+
+            db.collection('cart').add(cartItem).then(() => {
+                alert('장바구니에 추가되었습니다.');
+            }).catch(error => {
+                console.error('Error adding document: ', error);
             });
         }
     </script>
