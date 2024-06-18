@@ -124,6 +124,15 @@
                     albumDescription.classList.add('description');
                     // Replace line breaks with <br> tags
                     albumDescription.innerHTML = (album.description || '설명이 없습니다.').replace(/\n/g, '<br>');
+
+                    // MP3 파일 추가
+                    if (album.audio_file_url) {
+                        const audioElement = document.createElement('audio');
+                        audioElement.src = album.audio_file_url;
+                        audioElement.autoplay = true; // 자동 재생
+                        audioElement.style.display = 'none'; // 컨트롤러 숨기기
+                        albumInfoDiv.appendChild(audioElement);
+                    }
                     
                 });
             }).catch(error => {
@@ -148,6 +157,5 @@
             });
         }
     </script>
-     <script type="module" src="../script/navbar.js"></script>
 </body>
 </html>
