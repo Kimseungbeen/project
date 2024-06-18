@@ -337,6 +337,15 @@ a:hover {
     color: gray;
 }
 
+.description {
+    margin-top: 20px;
+}
+
+audio {
+    display: block;
+    margin: 20px auto;
+}
+
 /*album-info css*/
 .album-info {
     text-align: center;

@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>
-        .footer {
-    position: relative !important;
-}
-    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>앨범 정보</title>
@@ -13,7 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="header"></div>
@@ -23,7 +18,7 @@
     </div>
 
     <div id="footer"></div>
-    <script type="module" src="../script/navbar.js"></script>
+
     <script>
         // 헤더를 동적으로 로드하는 함수
         function loadHeader() {
@@ -133,10 +128,15 @@
                     // MP3 파일 추가
                     if (album.audio_file_url) {
                         const audioElement = document.createElement('audio');
-                        audioElement.src = album.audio_file_url;
+                        audioElement.controls = true;
                         audioElement.autoplay = true; // 자동 재생
-                        audioElement.style.display = 'none'; // 컨트롤러 숨기기
-                        albumInfoDiv.appendChild(audioElement);
+                        audioElement.src = album.audio_file_url;
+
+                        // Add to Cart 아래에 오토플레이 컨트롤러를 이동
+                        const breakElement = document.createElement('div');
+                        breakElement.style.marginTop = '10px'; // 간격 추가
+                        albumInfoDiv.insertBefore(breakElement, addToCartButton.nextSibling);
+                        albumInfoDiv.insertBefore(audioElement, breakElement.nextSibling);
                     }
                     
                 });
