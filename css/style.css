@@ -1,5 +1,5 @@
 /* 전체 HTML 및 body 설정 */
-html, body {
+html {
     margin: 0;
     padding: 0;
 }
@@ -9,7 +9,6 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background-color: #fff;
-    padding-bottom: 100px; /* 푸터 높이만큼 패딩 추가 */
     display: flex;
     flex-direction: column;
 }
@@ -337,15 +336,6 @@ a:hover {
     color: gray;
 }
 
-.description {
-    margin-top: 20px;
-}
-
-audio {
-    display: block;
-    margin: 20px auto;
-}
-
 /*album-info css*/
 .album-info {
     text-align: center;
@@ -414,6 +404,15 @@ audio {
 
 .search-container button:hover {
     background-color: #0056b3;
+}
+
+.description {
+    margin-top: 20px;
+}
+
+audio {
+    display: block;
+    margin: 20px auto;
 }
 
 /* 반응형 디자인 */
