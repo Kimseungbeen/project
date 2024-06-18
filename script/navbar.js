@@ -26,16 +26,19 @@ onAuthStateChanged(auth, (user) => {
         loginLink.style.display = 'none';
         joinLink.style.display = 'none';
         logoutLink.style.display = 'block';
+        // 로그아웃 이벤트 리스너 추가
+        logoutLink.addEventListener('click', logout);
     } else {
         loginLink.style.display = 'block';
         joinLink.style.display = 'block';
         logoutLink.style.display = 'none';
+        // 로그아웃 이벤트 리스너 제거
+        logoutLink.removeEventListener('click', logout);
     }
 });
 
 // 로그아웃 기능
-const logoutLink = document.getElementById('logout-link');
-logoutLink.addEventListener('click', async (e) => {
+async function logout(e) {
     e.preventDefault();
     try {
         await signOut(auth);
@@ -45,4 +48,4 @@ logoutLink.addEventListener('click', async (e) => {
         console.error('Error logging out:', error);
         alert('Logout Failed: ' + error.message);
     }
-});
+}

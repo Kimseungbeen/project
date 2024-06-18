@@ -70,6 +70,15 @@ body {
     font-size: 14px;
 }
 
+/* 링크 스타일링 추가 */
+a {
+    text-decoration: none;
+    color: black;
+}
+a:hover {
+    text-decoration: none;
+    color: black;
+}
 
 /* wrapper 설정 */
 .wrapper {
@@ -104,7 +113,6 @@ body {
 .footer a:hover {
     color: #fff;
 }
-
 
 /* about.css */
 .about-content {
@@ -294,7 +302,7 @@ body {
     overflow-y: auto;
 }
 
-.store-container{
+.store-container {
     display: flex;
     width: 100%;
     flex-wrap: wrap;
@@ -319,12 +327,15 @@ body {
     width: 100%;
     height: 80%;
 }
+
 .store-album p {
-    margin: 10px 0; 
+    margin: 10px 0;
 }
+
 .store-album p1 {
     color: gray;
 }
+
 /*album-info css*/
 .album-info {
     text-align: center;
@@ -332,6 +343,7 @@ body {
     padding: 20px;
     justify-content: center;
 }
+
 .album-info img {
     width: 200px;
     height: auto;
@@ -348,6 +360,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .add-to-cart-btn:hover {
     background-color: #333;
 }
