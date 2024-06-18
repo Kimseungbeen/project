@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Search</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <h1>음반 삽입 및 검색</h1>
+    
+    <h2>앨범 삽입</h2>
+    <input type="text" id="albumName" placeholder="앨범명">
+    <input type="text" id="artistName" placeholder="아티스트명">
+    <input type="number" id="price" placeholder="가격">
+    <textarea id="description" placeholder="음반 설명"></textarea>
+    <input type="file" id="coverImage" accept="image/jpeg">
+    <input type="date" id="releaseDate" placeholder="발매일">
+    <button onclick="addAlbum()">앨범 추가</button>
+
+    <h2>앨범 검색</h2>
+    <input type="text" id="searchQuery" placeholder="앨범명 또는 아티스트명을 입력하세요">
+    <button onclick="searchAlbums()">검색</button>
+    <div id="results"></div>
+
+    <script>
+        // Firebase 구성
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0tTW3h8TC2LNjVnPHsgAwAaAJ9hQ-GGU",
+            authDomain: "musicweb-67e10.firebaseapp.com",
+            projectId: "musicweb-67e10",
+            storageBucket: "musicweb-67e10.appspot.com",
+            messagingSenderId: "411216875147",
+            appId: "1:411216875147:web:6bd13f389eed0a42580e8e"
+        };
+
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // 앨범 추가 함수
+        function addAlbum() {
+            const albumName = document.getElementById('albumName').value;
+            const artistName = document.getElementById('artistName').value;
+            const price = parseFloat(document.getElementById('price').value);
+            const description = document.getElementById('description').value;
+            const coverImage = document.getElementById('coverImage').files[0];
+            const releaseDate = document.getElementById('releaseDate').value;
+
+            if (coverImage) {
+                const storageRef = storage.ref(`images/${coverImage.name}`);
+                const uploadTask = storageRef.put(coverImage);
+
+                uploadTask.on('state_changed', 
+                    (snapshot) => {},
+                    (error) => {
+                        console.error('Error uploading image: ', error);
+                    }, 
+                    () => {
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            db.collection('albums').add({
+                                album_name: albumName,
+                                artist_name: artistName,
+                                price: price,
+                                description: description,
+                                cover_image_url: downloadURL,
+                                release_date: firebase.firestore.Timestamp.fromDate(new Date(releaseDate)),
+                                album_name_lowercase: albumName.toLowerCase(),
+                                artist_name_lowercase: artistName.toLowerCase()
+                            })
+                            .then(() => {
+                                alert('앨범이 성공적으로 추가되었습니다.');
+                            })
+                            .catch(error => {
+                                console.error('Error adding document: ', error);
+                            });
+                        });
+                    }
+                );
+            } else {
+                alert('이미지를 선택해주세요.');
+            }
+        }
+
+        // 앨범 검색 함수
+        function searchAlbums() {
+            const query = document.getElementById('searchQuery').value.toLowerCase();
+            db.collection('albums')
+                .orderBy('album_name_lowercase')
+                .startAt(query)
+                .endAt(query + "\uf8ff")
+                .get()
+                .then(albumNameSnapshot => {
+                    db.collection('albums')
+                        .orderBy('artist_name_lowercase')
+                        .startAt(query)
+                        .endAt(query + "\uf8ff")
+                        .get()
+                        .then(artistNameSnapshot => {
+                            const resultsDiv = document.getElementById('results');
+                            resultsDiv.innerHTML = '';
+                            const combinedSnapshots = new Set();
+                            albumNameSnapshot.forEach(doc => combinedSnapshots.add(doc));
+                            artistNameSnapshot.forEach(doc => combinedSnapshots.add(doc));
+                            
+                            if (combinedSnapshots.size === 0) {
+                                resultsDiv.innerHTML = '<p>일치하는 문서가 없습니다.</p>';
+                                return;
+                            }
+
+                            combinedSnapshots.forEach(doc => {
+                                const album = doc.data();
+                                const albumDiv = document.createElement('div');
+                                albumDiv.innerHTML = `
+                                    <img src="${album.cover_image_url}" alt="Album Cover" width="100">
+                                    <p>음반명: ${album.album_name}</p>
+                                    <p>아티스트명: ${album.artist_name}</p>
+                                    <p>가격: ${album.price}원</p>
+                                    <p>설명: ${album.description}</p>
+                                    <p>발매일: ${album.release_date.toDate ? album.release_date.toDate().toLocaleDateString() : new Date(album.release_date.seconds * 1000).toLocaleDateString()}</p>
+                                `;
+                                resultsDiv.appendChild(albumDiv);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error getting documents: ', error);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error getting documents: ', error);
+                });
+        }
+
+        // Firestore 데이터 저장 전에 album_name_lowercase 및 artist_name_lowercase 필드 추가
+        db.collection("albums").get().then(snapshot => {
+            snapshot.forEach(doc => {
+                const album = doc.data();
+                if (!album.album_name_lowercase) {
+                    db.collection('albums').doc(doc.id).update({
+                        album_name_lowercase: album.album_name.toLowerCase()
+                    });
+                }
+                if (!album.artist_name_lowercase) {
+                    db.collection('albums').doc(doc.id).update({
+                        artist_name_lowercase: album.artist_name.toLowerCase()
+                    });
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
