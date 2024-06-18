@@ -18,6 +18,7 @@
     <input type="number" id="price" placeholder="가격">
     <textarea id="description" placeholder="음반 설명"></textarea>
     <input type="file" id="coverImage" accept="image/jpeg">
+    <input type="file" id="audioFile" accept="audio/*">
     <input type="date" id="releaseDate" placeholder="발매일">
     <button onclick="addAlbum()">앨범 추가</button>
 
@@ -43,47 +44,58 @@
         const storage = firebase.storage();
 
         // 앨범 추가 함수
-        function addAlbum() {
+        async function addAlbum() {
             const albumName = document.getElementById('albumName').value;
             const artistName = document.getElementById('artistName').value;
             const price = parseFloat(document.getElementById('price').value);
             const description = document.getElementById('description').value;
             const coverImage = document.getElementById('coverImage').files[0];
+            const audioFile = document.getElementById('audioFile').files[0];
             const releaseDate = document.getElementById('releaseDate').value;
 
             if (coverImage) {
-                const storageRef = storage.ref(`images/${coverImage.name}`);
-                const uploadTask = storageRef.put(coverImage);
+                const coverImageUrl = await uploadFile(coverImage, 'images');
+                const audioFileUrl = audioFile ? await uploadFile(audioFile, 'audios') : null;
+                
+                db.collection('albums').add({
+                    album_name: albumName,
+                    artist_name: artistName,
+                    price: price,
+                    description: description,
+                    cover_image_url: coverImageUrl,
+                    audio_file_url: audioFileUrl,
+                    release_date: firebase.firestore.Timestamp.fromDate(new Date(releaseDate)),
+                    album_name_lowercase: albumName.toLowerCase(),
+                    artist_name_lowercase: artistName.toLowerCase()
+                })
+                .then(() => {
+                    alert('앨범이 성공적으로 추가되었습니다.');
+                })
+                .catch(error => {
+                    console.error('Error adding document: ', error);
+                });
+            } else {
+                alert('이미지를 선택해주세요.');
+            }
+        }
+
+        // 파일 업로드 함수
+        function uploadFile(file, folder) {
+            return new Promise((resolve, reject) => {
+                const storageRef = storage.ref(`${folder}/${file.name}`);
+                const uploadTask = storageRef.put(file);
 
                 uploadTask.on('state_changed', 
                     (snapshot) => {},
                     (error) => {
-                        console.error('Error uploading image: ', error);
+                        console.error('Error uploading file: ', error);
+                        reject(error);
                     }, 
                     () => {
-                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                            db.collection('albums').add({
-                                album_name: albumName,
-                                artist_name: artistName,
-                                price: price,
-                                description: description,
-                                cover_image_url: downloadURL,
-                                release_date: firebase.firestore.Timestamp.fromDate(new Date(releaseDate)),
-                                album_name_lowercase: albumName.toLowerCase(),
-                                artist_name_lowercase: artistName.toLowerCase()
-                            })
-                            .then(() => {
-                                alert('앨범이 성공적으로 추가되었습니다.');
-                            })
-                            .catch(error => {
-                                console.error('Error adding document: ', error);
-                            });
-                        });
+                        uploadTask.snapshot.ref.getDownloadURL().then(resolve);
                     }
                 );
-            } else {
-                alert('이미지를 선택해주세요.');
-            }
+            });
         }
 
         // 앨범 검색 함수
@@ -122,6 +134,7 @@
                                     <p>가격: ${album.price}원</p>
                                     <p>설명: ${album.description}</p>
                                     <p>발매일: ${album.release_date.toDate ? album.release_date.toDate().toLocaleDateString() : new Date(album.release_date.seconds * 1000).toLocaleDateString()}</p>
+                                    ${album.audio_file_url ? `<audio controls><source src="${album.audio_file_url}" type="audio/mpeg"></audio>` : ''}
                                 `;
                                 resultsDiv.appendChild(albumDiv);
                             });

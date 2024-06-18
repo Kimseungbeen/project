@@ -30,7 +30,7 @@
         </div>
         <div id="footer"></div>
     </div>
-
+    <script type="module" src="../script/navbar.js"></script>
     <script>
         // 헤더를 동적으로 로드하는 함수
         function loadHeader() {
@@ -155,6 +155,9 @@
             const albumName = document.createElement('h2');
             albumName.textContent = album.album_name;
 
+            const albumartistname = document.createElement('p');
+            albumartistname.textContent = `Artist: ${album.artist_name}`;
+
             const albumPrice = document.createElement('p');
             albumPrice.textContent = `Price: ${album.price}`;
 
@@ -163,12 +166,12 @@
 
             albumDiv.appendChild(albumImg);
             albumDiv.appendChild(albumName);
+            albumDiv.appendChild(albumartistname)
             albumDiv.appendChild(albumPrice);
             albumDiv.appendChild(albumDate);
 
             return albumDiv;
         }
     </script>
-     <script type="module" src="../script/navbar.js"></script>
 </body>
 </html>

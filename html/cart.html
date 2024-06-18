@@ -3,34 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>앨범 목록</title>
+    <title>장바구니</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-    <!-- 스타일 시트 -->
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/cart.css">
 </head>
-
 <body>
     <div id="header"></div>
-    <div class="store-content">
-        <div class="store-top">
-            <h1>STORE</h1>
-            <p>오픈소스 웹소프트웨어 CBNU RECORDS팀 홈페이지-STORE</p>
-        </div>
 
-        <div class="search-container">
-            <input type="text" id="searchQuery" placeholder="앨범명 또는 아티스트명을 입력하세요">
-            <button onclick="searchAlbums()">검색</button>
+    <div class="content">
+        <h1 style="text-align:center; color: #fff;">장바구니</h1>
+        <div class="cart-container">
+            <table id="cartTable">
+                <thead>
+                    <tr>
+                        <th>상품 이미지</th>
+                        <th>상품명</th>
+                        <th>가격</th>
+                        <th>합계</th>
+                        <th>삭제</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 장바구니 항목들이 여기에 동적으로 추가될 것입니다. -->
+                </tbody>
+            </table>
+            <div class="total-container">
+                총 합계: <span id="totalPrice">₩0</span>
+            </div>
+            <div class="buy-button-container">
+                <button class="buy-button" onclick="purchaseItems()">구매하기</button>
+            </div>
         </div>
-
-        <div class="store-container" id="albumList">
-            <!-- 앨범 항목들이 여기에 동적으로 추가될 것입니다. -->
-        </div>
-        <div id="footer"></div>
     </div>
 
+    <div id="footer"></div>
+    <script type="module" src="../script/navbar.js"></script>
     <script>
         // 헤더를 동적으로 로드하는 함수
         function loadHeader() {
@@ -60,7 +69,7 @@
         window.onload = function() {
             loadHeader();
             loadFooter();
-            loadAllAlbums(); // 페이지 로드 시 모든 앨범을 로드합니다.
+            loadCart();
         };
 
         // Firebase 구성
@@ -76,99 +85,84 @@
         // Firebase 초기화
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const storage = firebase.storage();
 
-        // 모든 앨범을 로드하는 함수
-        function loadAllAlbums() {
-            db.collection('albums').get().then(snapshot => {
-                const albumList = document.getElementById('albumList');
-                albumList.innerHTML = ''; // 기존 앨범 목록을 지웁니다.
+        // Firestore에서 장바구니 데이터 가져오기
+        function loadCart() {
+            db.collection('cart').get().then(snapshot => {
+                const cartTableBody = document.querySelector('#cartTable tbody');
+                cartTableBody.innerHTML = ''; // Clear previous cart items
+                let totalPrice = 0;
+
                 snapshot.forEach(doc => {
-                    const album = doc.data();
-                    const albumDiv = createAlbumDiv(album);
-                    albumList.appendChild(albumDiv);
+                    const cartItem = doc.data();
+                    const cartRow = document.createElement('tr');
+
+                    const imgCell = document.createElement('td');
+                    const itemImg = document.createElement('img');
+                    itemImg.src = cartItem.image_url;
+                    itemImg.alt = cartItem.name;
+                    imgCell.appendChild(itemImg);
+
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = cartItem.name;
+
+                    const priceCell = document.createElement('td');
+                    priceCell.textContent = `₩${cartItem.price.toLocaleString()}`;
+
+                    const totalCell = document.createElement('td');
+                    const itemTotal = cartItem.price; // Since quantity is removed, total is same as price
+                    totalCell.textContent = `₩${itemTotal.toLocaleString()}`;
+
+                    const deleteCell = document.createElement('td');
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = '삭제';
+                    deleteButton.onclick = () => deleteCartItem(doc.id);
+                    deleteCell.appendChild(deleteButton);
+
+                    cartRow.appendChild(imgCell);
+                    cartRow.appendChild(nameCell);
+                    cartRow.appendChild(priceCell);
+                    cartRow.appendChild(totalCell);
+                    cartRow.appendChild(deleteCell);
+
+                    cartTableBody.appendChild(cartRow);
+
+                    totalPrice += itemTotal;
                 });
+
+                document.getElementById('totalPrice').textContent = `₩${totalPrice.toLocaleString()}`;
             }).catch(error => {
                 console.error('Error getting documents: ', error);
             });
         }
 
-        // 앨범 검색 함수
-        function searchAlbums() {
-            const query = document.getElementById('searchQuery').value.toLowerCase();
-            if (!query) {
-                loadAllAlbums(); // 검색어가 없으면 모든 앨범을 로드합니다.
-                return;
-            }
-
-            db.collection('albums')
-                .orderBy('album_name_lowercase')
-                .startAt(query)
-                .endAt(query + "\uf8ff")
-                .get()
-                .then(albumNameSnapshot => {
-                    db.collection('albums')
-                        .orderBy('artist_name_lowercase')
-                        .startAt(query)
-                        .endAt(query + "\uf8ff")
-                        .get()
-                        .then(artistNameSnapshot => {
-                            const albumList = document.getElementById('albumList');
-                            albumList.innerHTML = ''; // 기존 앨범 목록을 지웁니다.
-                            const combinedSnapshots = new Set();
-                            albumNameSnapshot.forEach(doc => combinedSnapshots.add(doc));
-                            artistNameSnapshot.forEach(doc => combinedSnapshots.add(doc));
-
-                            if (combinedSnapshots.size === 0) {
-                                albumList.innerHTML = '<p>일치하는 문서가 없습니다.</p>';
-                                return;
-                            }
-
-                            combinedSnapshots.forEach(doc => {
-                                const album = doc.data();
-                                const albumDiv = createAlbumDiv(album);
-                                albumList.appendChild(albumDiv);
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error getting documents: ', error);
-                        });
-                })
-                .catch(error => {
-                    console.error('Error getting documents: ', error);
-                });
+        // Firestore에서 장바구니 항목 삭제
+        function deleteCartItem(id) {
+            db.collection('cart').doc(id).delete().then(() => {
+                // 항목을 삭제한 후 다시 장바구니를 로드합니다.
+                loadCart();
+            }).catch(error => {
+                console.error('Error removing document: ', error);
+            });
         }
 
-        // 앨범 Div를 생성하는 함수
-        function createAlbumDiv(album) {
-            const albumDiv = document.createElement('div');
-            albumDiv.classList.add('store-album');
+        // 구매하기 버튼 클릭 시 장바구니 초기화
+        function purchaseItems() {
+            db.collection('cart').get().then(snapshot => {
+                const batch = db.batch();
 
-            // 앨범 이미지를 클릭할 때 호출되는 함수
-            albumDiv.onclick = function() {
-                window.location.href = `album_info.html?albumName=${encodeURIComponent(album.album_name)}`;
-            };
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
 
-            const albumImg = document.createElement('img');
-            albumImg.src = album.cover_image_url;
-
-            const albumName = document.createElement('h2');
-            albumName.textContent = album.album_name;
-
-            const albumPrice = document.createElement('p');
-            albumPrice.textContent = `Price: ${album.price}`;
-
-            const albumDate = document.createElement('p1');
-            albumDate.textContent = album.release_date.toDate ? album.release_date.toDate().toLocaleDateString() : new Date(album.release_date.seconds * 1000).toLocaleDateString();
-
-            albumDiv.appendChild(albumImg);
-            albumDiv.appendChild(albumName);
-            albumDiv.appendChild(albumPrice);
-            albumDiv.appendChild(albumDate);
-
-            return albumDiv;
+                return batch.commit();
+            }).then(() => {
+                alert('구매했습니다.');
+                loadCart();
+            }).catch(error => {
+                console.error('Error purchasing items: ', error);
+            });
         }
     </script>
-     <script type="module" src="../script/navbar.js"></script>
 </body>
 </html>
